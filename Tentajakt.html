@@ -1,0 +1,795 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Tentajakt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=STIX+Two+Text:wght@400;600&display=swap">
+<style>
+/* Layout: en sida millimeterpapper. Blå kulspetspenna, röd rättarpenna, gul överstrykningspenna.
+   Kort med hård kantlinje och förskjuten skugga, som klistermärken på ett kollegieblock. */
+:root {
+  --paper: #E8EEF1;
+  --card: #F8FAFB;
+  --ink: #0F2236;
+  --ink2: #4C6075;
+  --grid: rgba(36, 87, 245, 0.11);
+  --pen: #2457F5;
+  --pen-ink: #FFFFFF;
+  --hi: #FFE14D;
+  --hi-ink: #1A1608;
+  --ok: #0F8A58;
+  --ok-bg: #D5F2E4;
+  --bad: #D3303A;
+  --bad-bg: #FBDFE1;
+  --soft: #D6E0E6;
+  --f-ui: "Familjen Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-math: "STIX Two Text", "Cambria Math", "Times New Roman", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0B1727; --card: #12243A; --ink: #E8F0FA; --ink2: #93A8BF;
+    --grid: rgba(110, 162, 255, 0.10); --pen: #6C9BFF; --pen-ink: #07111E;
+    --hi: #FFD84D; --hi-ink: #1A1608; --ok: #43D08F; --ok-bg: #0F3A2A;
+    --bad: #FF7A80; --bad-bg: #47191D; --soft: #1D3552; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0B1727; --card: #12243A; --ink: #E8F0FA; --ink2: #93A8BF;
+  --grid: rgba(110, 162, 255, 0.10); --pen: #6C9BFF; --pen-ink: #07111E;
+  --hi: #FFD84D; --hi-ink: #1A1608; --ok: #43D08F; --ok-bg: #0F3A2A;
+  --bad: #FF7A80; --bad-bg: #47191D; --soft: #1D3552; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 22px 22px;
+  color: var(--ink);
+  font-family: var(--f-ui);
+  font-size: 16px;
+  line-height: 1.4;
+  -webkit-text-size-adjust: 100%;
+}
+#app { max-width: 520px; margin: 0 auto; padding-inline: 16px; padding-block: 14px 40px; }
+button { font: inherit; color: inherit; }
+.f { font-family: var(--f-math); }
+sup, sub { font-size: 0.68em; line-height: 0; }
+.ss { display: inline-flex; flex-direction: column; vertical-align: middle; font-size: 0.62em; line-height: 1.15; margin-inline: 0.12em; text-align: center; }
+.ss sup, .ss sub { font-size: 1em; position: static; vertical-align: baseline; line-height: 1.15; }
+
+/* knappar */
+.btn {
+  display: block; width: 100%; text-align: left; cursor: pointer;
+  background: var(--card); color: var(--ink);
+  border: 2px solid var(--ink); border-radius: 14px;
+  padding: 14px 16px; font-weight: 600;
+  box-shadow: 0 4px 0 var(--ink);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+}
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+.btn:focus-visible, .zone:focus-visible, .opt:focus-visible, .ghost:focus-visible, summary:focus-visible, input:focus-visible { outline: 3px solid var(--pen); outline-offset: 3px; }
+.btn.primary { background: var(--pen); color: var(--pen-ink); }
+.btn.center { text-align: center; }
+.ghost { background: none; border: 0; padding: 8px 4px; color: var(--ink2); font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; touch-action: manipulation; }
+
+/* startsida */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+.chip { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 9px; border: 2px solid var(--ink); border-radius: 99px; background: var(--card); }
+.chip.hi { background: var(--hi); color: var(--hi-ink); }
+h1.brand { font-size: clamp(46px, 15vw, 64px); line-height: 0.95; letter-spacing: -0.03em; margin: 10px 0 6px; font-weight: 700; text-wrap: balance; }
+h1.brand mark { background: var(--hi); color: var(--hi-ink); padding: 0 0.08em; border-radius: 4px; }
+.lede { color: var(--ink2); margin: 0 0 18px; max-width: 34ch; }
+.xp { margin: 0 0 20px; }
+.xp-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-weight: 600; margin-bottom: 6px; }
+.xp-row small { color: var(--ink2); font-weight: 500; font-variant-numeric: tabular-nums; }
+.bar { height: 12px; border: 2px solid var(--ink); border-radius: 99px; background: var(--card); overflow: hidden; }
+.bar > i { display: block; height: 100%; background: var(--pen); border-radius: 99px; transition: width 0.25s ease; }
+.bar.low > i { background: var(--bad); }
+.stack { display: grid; gap: 14px; }
+.btn small { display: block; font-weight: 500; opacity: 0.85; margin-top: 2px; }
+.btn .big { font-size: 26px; letter-spacing: -0.01em; line-height: 1.1; font-weight: 700; display: block; }
+.sec { display: flex; justify-content: space-between; align-items: baseline; margin: 30px 0 12px; }
+.sec h2 { margin: 0; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; }
+.sec span { color: var(--ink2); font-size: 13px; }
+.zones { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.zone { text-align: left; background: var(--card); border: 2px solid var(--ink); border-radius: 14px; padding: 12px 12px 12px; box-shadow: 0 4px 0 var(--ink); cursor: pointer; display: flex; flex-direction: column; gap: 6px; min-width: 0; transition: transform 0.08s ease, box-shadow 0.08s ease; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.zone:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+.zone b { font-size: 17px; line-height: 1.15; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.zone .sub { color: var(--ink2); font-size: 13px; line-height: 1.25; }
+.zone .meta { margin-top: auto; padding-top: 6px; display: grid; gap: 6px; }
+.zone .w { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink2); }
+.stars { font-size: 20px; letter-spacing: 2px; line-height: 1; }
+.stars .on { color: var(--hi); -webkit-text-stroke: 1.2px var(--ink); }
+.stars .off { color: var(--ink2); opacity: 0.55; }
+.mini { height: 6px; background: var(--soft); border-radius: 99px; overflow: hidden; }
+.mini > i { display: block; height: 100%; background: var(--ok); }
+.foot { margin-top: 34px; color: var(--ink2); font-size: 13px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; }
+
+/* spelet */
+.hud { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; min-height: 40px; }
+.hud .lives { display: flex; gap: 6px; }
+.pip { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--ink); background: var(--bad); }
+.pip.gone { background: transparent; opacity: 0.45; }
+.combo { background: var(--hi); color: var(--hi-ink); border: 2px solid var(--ink); border-radius: 99px; padding: 2px 11px; font-weight: 700; font-variant-numeric: tabular-nums; min-width: 54px; text-align: center; }
+.combo.pop { animation: pop 0.3s ease; }
+.score { font-weight: 700; font-variant-numeric: tabular-nums; min-width: 4ch; text-align: right; }
+.count { font-weight: 600; color: var(--ink2); font-variant-numeric: tabular-nums; }
+.qcard { background: var(--card); border: 2px solid var(--ink); border-radius: 16px; padding: 18px 16px 20px; margin: 14px 0 18px; box-shadow: 0 4px 0 var(--ink); min-height: 132px; display: flex; flex-direction: column; gap: 10px; justify-content: center; }
+.qcard .zn { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink2); }
+.qtext { font-family: var(--f-math); font-size: clamp(24px, 7vw, 32px); line-height: 1.25; overflow-wrap: anywhere; }
+.qtext.long { font-size: clamp(18px, 5vw, 21px); line-height: 1.35; }
+.opts { display: grid; gap: 12px; }
+.opt { display: flex; align-items: center; min-height: 58px; width: 100%; text-align: left; cursor: pointer; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 14px; padding: 10px 14px; box-shadow: 0 4px 0 var(--ink); font-family: var(--f-math); font-size: 20px; line-height: 1.25; overflow-wrap: anywhere; transition: transform 0.08s ease, box-shadow 0.08s ease; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.opt.long { font-size: 16.5px; }
+.opt:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+.opt:disabled { cursor: default; }
+.opt.ok { background: var(--ok-bg); border-color: var(--ok); box-shadow: 0 4px 0 var(--ok); }
+.opt.bad { background: var(--bad-bg); border-color: var(--bad); box-shadow: 0 4px 0 var(--bad); animation: shake 0.3s ease; }
+.opt.dim { opacity: 0.5; }
+.fb { margin-top: 18px; border: 2px solid var(--ink); border-radius: 14px; padding: 14px 16px; background: var(--card); display: grid; gap: 10px; }
+.fb.ok { background: var(--ok-bg); border-color: var(--ok); }
+.fb.bad { background: var(--bad-bg); border-color: var(--bad); }
+.fb h3 { margin: 0; font-size: 18px; }
+.fb p { margin: 0; }
+.fb .ans { font-family: var(--f-math); font-size: 20px; }
+.flash { position: fixed; left: 50%; top: 18%; transform: translateX(-50%); pointer-events: none; font-weight: 700; font-size: 22px; background: var(--hi); color: var(--hi-ink); border: 2px solid var(--ink); border-radius: 99px; padding: 4px 16px; animation: rise 0.7s ease forwards; }
+
+/* resultat */
+.res { text-align: center; margin: 18px 0 20px; }
+.res .num { font-size: clamp(64px, 22vw, 96px); line-height: 1; font-weight: 700; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.res .num.pop { animation: pop 0.45s ease; }
+.res .stars { font-size: 44px; letter-spacing: 6px; margin: 8px 0; }
+.res .stars span { display: inline-block; }
+.res .stars .on { animation: pop 0.5s ease backwards; }
+.res .stars span:nth-child(2) { animation-delay: 0.12s; }
+.res .stars span:nth-child(3) { animation-delay: 0.24s; }
+.res p { margin: 6px 0; color: var(--ink2); }
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 16px 0; }
+.tile { border: 2px solid var(--ink); border-radius: 12px; background: var(--card); padding: 10px 6px; text-align: center; }
+.tile b { display: block; font-size: 22px; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.tile span { font-size: 12px; color: var(--ink2); }
+.lvl { background: var(--hi); color: var(--hi-ink); border: 2px solid var(--ink); border-radius: 12px; padding: 10px 14px; font-weight: 700; text-align: center; margin: 12px 0; }
+.miss { margin: 20px 0 6px; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; }
+.row { display: grid; gap: 4px; padding: 12px 0; border-top: 2px dashed var(--soft); }
+.row:first-of-type { border-top: 0; }
+.row .q { color: var(--ink2); font-family: var(--f-math); font-size: 17px; overflow-wrap: anywhere; }
+.row .a { font-family: var(--f-math); font-size: 20px; overflow-wrap: anywhere; }
+.row .e { color: var(--ink2); font-size: 14px; }
+.row .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--bad); margin-right: 6px; vertical-align: middle; }
+
+/* fusklapp */
+.search { width: 100%; padding: 12px 14px; border: 2px solid var(--ink); border-radius: 12px; background: var(--card); color: var(--ink); font: inherit; margin: 6px 0 16px; }
+details.cz { border: 2px solid var(--ink); border-radius: 14px; background: var(--card); margin-bottom: 12px; box-shadow: 0 4px 0 var(--ink); }
+details.cz > summary { list-style: none; cursor: pointer; padding: 14px 14px; font-weight: 700; display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+details.cz > summary::-webkit-details-marker { display: none; }
+details.cz > summary span { color: var(--ink2); font-weight: 500; font-size: 14px; }
+details.cz .body { padding: 0 14px 8px; }
+.empty { padding: 24px 6px; color: var(--ink2); text-align: center; }
+
+@keyframes pop { 0% { transform: scale(0.7); } 60% { transform: scale(1.18); } 100% { transform: scale(1); } }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+@keyframes rise { 0% { opacity: 0; transform: translate(-50%, 12px) scale(0.9); } 20% { opacity: 1; transform: translate(-50%, 0) scale(1); } 100% { opacity: 0; transform: translate(-50%, -30px) scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+<div id="app"></div>
+<script>
+/* Frågebank del A: trig + derivator. Format: [fråga, rätt, fel1, fel2, fel3, förklaring] */
+var BANK = [];
+function add(zone, rows) { rows.forEach(function (r) { BANK.push({ z: zone, q: r[0], a: r[1], d: [r[2], r[3], r[4]], e: r[5] || "" }); }); }
+
+add("trig", [
+["sin(π/6) = ?", "1/2", "√3/2", "√2/2", "1", "30° i en halv liksidig triangel: motstående katet är hälften av hypotenusan."],
+["cos(π/6) = ?", "√3/2", "1/2", "√2/2", "√3", "30°-60°-90°: närliggande katet är √3/2."],
+["sin(π/4) = ?", "√2/2", "1/2", "√3/2", "1", "Vid 45° är sin = cos = 1/√2 = √2/2."],
+["cos(π/3) = ?", "1/2", "√3/2", "√2/2", "0", "60°: närliggande katet är hälften av hypotenusan."],
+["sin(π/3) = ?", "√3/2", "1/2", "√2/2", "1", ""],
+["tan(π/4) = ?", "1", "√3", "1/√3", "0", "sin = cos vid 45°, alltså kvoten 1."],
+["tan(π/3) = ?", "√3", "1/√3", "1", "√3/2", "tan = sin/cos = (√3/2)/(1/2)."],
+["tan(π/6) = ?", "1/√3", "√3", "1", "1/2", "tan = sin/cos = (1/2)/(√3/2)."],
+["cos(π) = ?", "−1", "0", "1", "−1/2", ""],
+["sin(π) = ?", "0", "1", "−1", "π", ""],
+["cos(π/2) = ?", "0", "1", "−1", "1/2", ""],
+["sin(3π/4) = ?", "√2/2", "−√2/2", "1/2", "√3/2", "Andra kvadranten: sin är positiv. Referensvinkel π/4."],
+["cos(2π/3) = ?", "−1/2", "1/2", "−√3/2", "√3/2", "Andra kvadranten: cos är negativ. Referensvinkel π/3."],
+["sin(−π/6) = ?", "−1/2", "1/2", "−√3/2", "√3/2", "sin är udda: sin(−x) = −sin x."],
+["cos(−x) = ?", "cos x", "−cos x", "sin x", "−sin x", "cos är jämn: cos(−x) = cos x."],
+["sin^{2}x + cos^{2}x = ?", "1", "0", "2", "sin 2x", "Trigonometriska ettan."],
+["sin 2x = ?", "2 sin x cos x", "sin^{2}x − cos^{2}x", "2 sin x + 2 cos x", "cos^{2}x − sin^{2}x", "Dubbla vinkeln för sinus."],
+["cos 2x = ?", "cos^{2}x − sin^{2}x", "2 sin x cos x", "sin^{2}x − cos^{2}x", "cos^{2}x + sin^{2}x", "Kan också skrivas 2cos²x − 1 eller 1 − 2sin²x."],
+["sin^{2}x = ?", "(1 − cos 2x)/2", "(1 + cos 2x)/2", "(1 − sin 2x)/2", "1 − cos 2x", "Används för att integrera sin²x."],
+["cos^{2}x = ?", "(1 + cos 2x)/2", "(1 − cos 2x)/2", "(1 + sin 2x)/2", "cos 2x/2", "Används för att integrera cos²x."],
+["1 + tan^{2}x = ?", "1/cos^{2}x", "1/sin^{2}x", "tan^{2}x − 1", "1/cos x", "Dividera sin²+cos²=1 med cos²x."],
+["sin(a + b) = ?", "sin a cos b + cos a sin b", "sin a cos b − cos a sin b", "cos a cos b − sin a sin b", "sin a sin b + cos a cos b", ""],
+["cos(a + b) = ?", "cos a cos b − sin a sin b", "cos a cos b + sin a sin b", "sin a cos b + cos a sin b", "sin a sin b − cos a cos b", "Tecknet byter: cos(a+b) har minus."],
+["arcsin(1/2) = ?", "π/6", "π/3", "π/4", "π/2", "Vinkeln i [−π/2, π/2] vars sin är 1/2."],
+["arctan(1) = ?", "π/4", "π/2", "π/3", "1", ""],
+["arctan(√3) = ?", "π/3", "π/6", "π/4", "√3", "tan(π/3) = √3."],
+["arcsin(sin(3π/4)) = ?", "π/4", "3π/4", "−π/4", "π/2", "arcsin ger alltid en vinkel i [−π/2, π/2]. sin(3π/4) = sin(π/4)."],
+["arcsin(−1/2) = ?", "−π/6", "π/6", "−π/3", "−π/4", "arcsin är udda."],
+["Värdemängden till arctan x", "(−π/2, π/2)", "[−π/2, π/2]", "(0, π)", "(−π, π)", "Öppet intervall: π/2 antas aldrig, funktionen närmar sig bara."],
+["Värdemängden till arcsin x", "[−π/2, π/2]", "(−π/2, π/2)", "[0, π]", "[−1, 1]", "Definitionsmängd [−1, 1], värdemängd [−π/2, π/2]."],
+["Värdemängden till arccos x", "[0, π]", "[−π/2, π/2]", "(0, π)", "[0, 2π]", ""],
+["Definitionsmängden till arcsin x", "[−1, 1]", "(−1, 1)", "[−π/2, π/2]", "alla reella tal", ""]
+]);
+
+add("der", [
+["d/dx sin x = ?", "cos x", "−cos x", "−sin x", "tan x", ""],
+["d/dx cos x = ?", "−sin x", "sin x", "−cos x", "cos x", ""],
+["d/dx tan x = ?", "1/cos^{2}x", "1/sin^{2}x", "−1/cos^{2}x", "cos^{2}x", "Samma sak som 1 + tan²x."],
+["d/dx e^{x} = ?", "e^{x}", "x e^{x−1}", "e^{x−1}", "1", ""],
+["d/dx a^{x} = ?", "a^{x} ln a", "x a^{x−1}", "a^{x}", "a^{x}/ln a", "a^x = e^{x ln a}, kedjeregeln ger faktorn ln a."],
+["d/dx ln x = ?", "1/x", "x", "ln x/x", "−1/x^{2}", ""],
+["d/dx arcsin x = ?", "1/√(1−x^{2})", "−1/√(1−x^{2})", "1/(1+x^{2})", "1/√(1+x^{2})", ""],
+["d/dx arctan x = ?", "1/(1+x^{2})", "1/(1−x^{2})", "−1/(1+x^{2})", "1/√(1−x^{2})", ""],
+["d/dx arccos x = ?", "−1/√(1−x^{2})", "1/√(1−x^{2})", "−1/(1+x^{2})", "1/√(1+x^{2})", "arccos = π/2 − arcsin."],
+["d/dx x^{n} = ?", "n x^{n−1}", "x^{n−1}/n", "n x^{n}", "(n−1) x^{n}", ""],
+["d/dx √x = ?", "1/(2√x)", "2√x", "1/√x", "1/(2x)", "√x = x^{1/2}."],
+["d/dx (1/x) = ?", "−1/x^{2}", "1/x^{2}", "ln x", "−1/x", ""],
+["Produktregeln: (fg)′ = ?", "f′g + fg′", "f′g′", "f′g − fg′", "(fg)′/2", ""],
+["Kvotregeln: (f/g)′ = ?", "(f′g − fg′)/g^{2}", "(f′g + fg′)/g^{2}", "(fg′ − f′g)/g^{2}", "f′/g′", "Täljaren: derivera täljaren gånger nämnaren, minus täljaren gånger derivatan av nämnaren."],
+["Kedjeregeln: d/dx f(g(x)) = ?", "f′(g(x)) · g′(x)", "f′(x) · g′(x)", "f(g′(x))", "f′(g(x)) + g′(x)", ""],
+["d/dx e^{−x²} = ?", "−2x e^{−x²}", "e^{−x²}", "−x e^{−x²}", "2x e^{−x²}", "Kedjeregeln: inre derivatan av −x² är −2x."],
+["d/dx ln(1 + x²) = ?", "2x/(1 + x²)", "1/(1 + x²)", "x/(1 + x²)", "2x ln(1 + x²)", "f′/f-formen: inre derivata genom innehållet."],
+["d/dx (x ln x) = ?", "ln x + 1", "1/x", "ln x", "1 + 1/x", "Produktregeln: 1·ln x + x·(1/x)."],
+["d/dx (x e^{x}) = ?", "(x + 1) e^{x}", "x e^{x}", "e^{x}", "(x − 1) e^{x}", ""],
+["d/dx sin(x²) = ?", "2x cos(x²)", "cos(x²)", "−2x cos(x²)", "2x sin(x²)", ""],
+["d/dx arctan(1/x) = ?", "−1/(1 + x²)", "1/(1 + x²)", "x²/(1 + x²)", "−1/(1 + x^{−2})", "Kedjeregeln ger 1/(1+1/x²) · (−1/x²) = −1/(x²+1). Kom från en tenta 2016."],
+["d/dx sin²x = ?", "2 sin x cos x", "2 sin x", "cos²x", "2 cos x", ""],
+["d/dx ln(cos x) = ?", "−tan x", "tan x", "1/cos x", "cot x", "Inre derivatan −sin x genom cos x."],
+["d/dx √(1 + x²) = ?", "x/√(1 + x²)", "1/(2√(1 + x²))", "2x/√(1 + x²)", "x √(1 + x²)", "1/(2√u) · 2x."],
+["d/dx ∫_{0}^{x} f(t) dt = ?", "f(x)", "f′(x)", "f(x) − f(0)", "∫_{0}^{x} f′(t) dt", "Analysens fundamentalsats. Kräver att f är kontinuerlig."],
+["d/dx ∫_{0}^{x²} f(t) dt = ?", "2x f(x²)", "f(x²)", "f′(x²) · 2x", "x² f(x)", "Kedjeregeln: f(övre gränsen) gånger övre gränsens derivata."],
+["Tangenten till y = f(x) i x = a", "y = f(a) + f′(a)(x − a)", "y = f(a) + f′(x)(a − x)", "y = f′(a) + f(a)(x − a)", "y = f(a) − f′(a)(x + a)", "Samma sak som Taylorpolynom av grad 1."],
+["Normalens lutning i x = a", "−1/f′(a)", "1/f′(a)", "−f′(a)", "f′(a)", "Normalen är vinkelrät mot tangenten."],
+["Implicit derivering: x² + y² = 1 ger dy/dx = ?", "−x/y", "x/y", "−y/x", "2x/y", "Derivera båda led, d/dx y² = 2y·y′."],
+["(f⁻¹)′(f(a)) = ?", "1/f′(a)", "f′(a)", "−1/f′(a)", "1/f′(f(a))", "Inversens derivata är inverterad lutning."]
+]);
+/* Frågebank del B: primitiva, Maclaurin/Taylor, gränsvärden */
+
+add("prim", [
+["∫ x^{n} dx = ?  (n ≠ −1)", "x^{n+1}/(n+1)", "x^{n−1}/(n−1)", "n x^{n−1}", "x^{n}/(n+1)", "Höj exponenten med ett, dela med nya exponenten."],
+["∫ 1/x dx = ?", "ln|x|", "1/x²", "−1/x²", "x ln x", "Glöm inte beloppstecknen och + C."],
+["∫ e^{x} dx = ?", "e^{x}", "e^{x}/x", "x e^{x}", "e^{x+1}", ""],
+["∫ a^{x} dx = ?", "a^{x}/ln a", "a^{x} ln a", "a^{x+1}/(x+1)", "a^{x}", ""],
+["∫ sin x dx = ?", "−cos x", "cos x", "−sin x", "sin x", ""],
+["∫ cos x dx = ?", "sin x", "−sin x", "cos x", "−cos x", ""],
+["∫ tan x dx = ?", "−ln|cos x|", "ln|cos x|", "ln|sin x|", "1/cos²x", "Skriv tan = sin/cos och använd u = cos x. Kom på tenta 2016-06."],
+["∫ 1/cos²x dx = ?", "tan x", "−tan x", "1/sin x", "ln|cos x|", ""],
+["∫ 1/(1 + x²) dx = ?", "arctan x", "arcsin x", "ln(1 + x²)", "1/x", ""],
+["∫ 1/√(1 − x²) dx = ?", "arcsin x", "arctan x", "arccos x", "ln √(1 − x²)", "Även −arccos x är en primitiv funktion."],
+["∫ 1/(a² + x²) dx = ?", "(1/a) arctan(x/a)", "arctan(x/a)", "a arctan(x/a)", "(1/a²) arctan(x/a)", "Faktor 1/a ska med. Mycket vanlig fälla."],
+["∫ 1/(1 + 4x²) dx = ?", "(1/2) arctan(2x)", "arctan(2x)", "2 arctan(2x)", "(1/4) arctan(2x)", "u = 2x, du = 2dx."],
+["∫ 1/√(x² + a²) dx = ?", "ln(x + √(x² + a²))", "arcsin(x/a)", "(1/a) arctan(x/a)", "ln|x² + a²|", "Kom på tenta 2017-01 (visa att den är en primitiv funktion)."],
+["∫ ln x dx = ?", "x ln x − x", "1/x", "x ln x", "x ln x + x", "Partiell integration med 1·ln x."],
+["∫ arctan x dx = ?", "x arctan x − ½ ln(1 + x²)", "x arctan x + ½ ln(1 + x²)", "x arctan x − ln(1 + x²)", "1/(1 + x²)", "Partiell integration med 1·arctan x. Återkommer ofta."],
+["∫ arcsin x dx = ?", "x arcsin x + √(1 − x²)", "x arcsin x − √(1 − x²)", "x arcsin x + 1/√(1 − x²)", "x arcsin x + √(1 + x²)", "Partiell integration; resten ∫ x/√(1−x²) dx löses med u = 1 − x²."],
+["∫ x e^{x} dx = ?", "(x − 1) e^{x}", "(x + 1) e^{x}", "x e^{x}", "(x²/2) e^{x}", "Partiell: u = x, v′ = e^x."],
+["∫ x e^{x²} dx = ?", "½ e^{x²}", "e^{x²}", "2 e^{x²}", "x² e^{x²}/2", "u = x², du = 2x dx."],
+["∫ 2x/(1 + x²) dx = ?", "ln(1 + x²)", "arctan x", "ln|x|", "1/(1 + x²)²", "Täljaren är derivatan av nämnaren."],
+["∫ f′(x)/f(x) dx = ?", "ln|f(x)|", "f′(x) ln|f(x)|", "1/f(x)²", "f(x)/f′(x)", ""],
+["∫ x ln x dx = ?", "(x²/2) ln x − x²/4", "(x²/2) ln x + x²/4", "(x²/2) ln x − x²/2", "x ln x − x", "Partiell med u = ln x, v′ = x. Typen polynom · ln x kom på 10 av 40 tentor."],
+["∫ sin²x dx = ?", "x/2 − (sin 2x)/4", "x/2 + (sin 2x)/4", "x/2 − (sin 2x)/2", "sin³x/3", "Använd sin²x = (1 − cos 2x)/2."],
+["∫ cos²x dx = ?", "x/2 + (sin 2x)/4", "x/2 − (sin 2x)/4", "x/2 + (sin 2x)/2", "cos³x/3", "Använd cos²x = (1 + cos 2x)/2."],
+["∫ cos³x sin x dx = ?", "−cos⁴x/4", "cos⁴x/4", "sin⁴x/4", "−cos²x/2", "u = cos x, du = −sin x dx."],
+["∫ e^{3x} dx = ?", "e^{3x}/3", "3 e^{3x}", "e^{3x}", "e^{3x}/(3x)", "Inre derivatan 3 ska delas bort."],
+["∫ 1/(x ln x) dx = ?", "ln|ln x|", "(ln x)²/2", "1/ln x", "ln x/x", "u = ln x."],
+["∫ e^{x}/(1 + e^{x}) dx = ?", "ln(1 + e^{x})", "arctan(e^{x})", "e^{x} ln(1 + e^{x})", "1/(1 + e^{x})", "Täljaren är derivatan av nämnaren. Kom på tenta 2016-01."],
+["∫ (ln x)^{n}/x dx = ?  (n ≠ −1)", "(ln x)^{n+1}/(n+1)", "(ln x)^{n}/n", "n (ln x)^{n−1}", "ln x^{n+1}", "u = ln x, du = dx/x."],
+["∫ 1/(x² − 1) dx = ?", "½ ln|(x − 1)/(x + 1)|", "½ ln|(x + 1)/(x − 1)|", "ln|x² − 1|", "arctan x", "Partialbråk: 1/(x²−1) = ½(1/(x−1) − 1/(x+1))."],
+["∫ x (x² + 4)^{−1/3} dx = ?", "¾ (x² + 4)^{2/3}", "(3/2)(x² + 4)^{2/3}", "½ (x² + 4)^{2/3}", "¾ (x² + 4)^{−4/3}", "u = x² + 4, ½∫u^{−1/3}du. Tenta 2015."]
+]);
+
+add("mac", [
+["Maclaurin för e^{x}, till och med x³", "1 + x + x²/2 + x³/6", "1 + x + x² + x³", "x + x²/2 + x³/6", "1 + x + x²/2 + x³/3", "Nämnarna är fakulteter: 1, 1, 2, 6."],
+["Maclaurin för sin x, till och med x³", "x − x³/6", "x − x³/3", "x + x³/6", "1 − x²/2", "Bara udda potenser, vartannat tecken."],
+["Maclaurin för cos x, till och med x⁴", "1 − x²/2 + x⁴/24", "1 − x²/2 + x⁴/12", "1 + x²/2 + x⁴/24", "x − x³/6 + x⁵/120", "Bara jämna potenser, nämnare 2!, 4!."],
+["Maclaurin för ln(1 + x), till och med x⁴", "x − x²/2 + x³/3 − x⁴/4", "x + x²/2 + x³/3 + x⁴/4", "x − x²/2 + x³/6 − x⁴/24", "1 − x + x² − x³", "Nämnaren är bara n, inte n!. Används för närmevärde på ln 2, ln(6/5)."],
+["Maclaurin för arctan x, till och med x³", "x − x³/3", "x + x³/3", "x − x³/6", "1 − x²/2", "Derivatan 1/(1+x²) = 1 − x² + …"],
+["Maclaurin för 1/(1 − x), till och med x³", "1 + x + x² + x³", "1 − x + x² − x³", "1 + x + x²/2 + x³/6", "x + x²/2 + x³/3", "Geometrisk serie."],
+["Maclaurin för 1/(1 + x), till och med x³", "1 − x + x² − x³", "1 + x + x² + x³", "1 − x + x²/2 − x³/6", "x − x²/2 + x³/3", ""],
+["Maclaurin för (1 + x)^{a}, till och med x²", "1 + ax + a(a − 1)x²/2", "1 + ax + a x²/2", "1 + ax + a(a + 1)x²/2", "1 + ax + (a − 1)x²/2", "Binomialserien."],
+["Maclaurin för √(1 + x), till och med x²", "1 + x/2 − x²/8", "1 + x/2 + x²/8", "1 + x − x²/2", "1 + x/2 − x²/4", "a = ½: a(a−1)/2 = −1/8."],
+["Taylorpolynom av grad 2 kring a", "f(a) + f′(a)(x − a) + f″(a)(x − a)²/2", "f(a) + f′(a)(x − a) + f″(a)(x − a)²", "f(a) + f′(a)x + f″(a)x²/2", "f(a) + f′(a)(x − a) + f″(a)(x − a)²/6", "Nämnaren är 2! = 2."],
+["Lagranges restterm vid grad n", "f^{(n+1)}(s)/(n+1)! · (x − a)^{n+1}", "f^{(n)}(s)/n! · (x − a)^{n}", "f^{(n+1)}(s)/n! · (x − a)^{n+1}", "f^{(n+1)}(a)/(n+1)! · (x − a)^{n+1}", "s ligger mellan a och x. Derivatan av grad n+1, utvärderad i s (inte i a)."],
+["Felet vid linjär approximation (grad 1) kring a", "E(x) = f″(s)/2 · (x − a)²", "E(x) = f′(s) · (x − a)", "E(x) = f″(a) · (x − a)²", "E(x) = f‴(s)/6 · (x − a)³", "Visar att fel ≤ max|f″|/2 · (x − a)²."],
+["Fel i en alternerande serie som slutar efter n termer", "≤ första utelämnade termen", "≤ sista tagna termen", "= nästa term", "≤ summan av alla termer", "Gäller när termerna avtar mot 0 i belopp."],
+["Maclaurin för e^{−x²}, till och med x⁴", "1 − x² + x⁴/2", "1 + x² + x⁴/2", "1 − x²/2 + x⁴/24", "1 − x² + x⁴/6", "Sätt u = −x² i 1 + u + u²/2."],
+["Taylorpolynom av grad 2 kring 0 för arctan(x²)", "x²", "x", "x² − x⁴/3", "x²/2", "arctan u = u − u³/3, så nästa term är x⁶. Kom på tenta 2022-03."],
+["Maclaurin för cos(x²), till och med x⁴", "1 − x⁴/2", "1 − x²/2 + x⁴/24", "1 − x⁴/24", "1 − x²/2", "Sätt u = x² i 1 − u²/2."],
+["Taylorpolynom av grad 2 kring 0 för ln(1 + x²)", "x²", "x − x²/2", "x²/2", "2x", "ln(1+u) = u − u²/2 + …, med u = x²."],
+["Maclaurin för sin 2x, till och med x³", "2x − 4x³/3", "2x − x³/3", "2x − 8x³", "2x − 2x³/3", "Sätt in 2x: 2x − (2x)³/6."],
+["Taylorpolynom av grad 1 för e^{x} kring x = 1", "e + e(x − 1)", "1 + (x − 1)", "e + (x − 1)", "e(x − 1)", "f(1) = f′(1) = e."],
+["Taylorpolynom av grad 1 för √x kring x = 4", "2 + (x − 4)/4", "2 + (x − 4)/2", "2 + (x − 4)/8", "4 + (x − 4)/4", "f(4) = 2, f′(4) = 1/(2·2) = 1/4."],
+["Taylorpolynom av grad 2 för ln x kring x = 1", "(x − 1) − (x − 1)²/2", "(x − 1) + (x − 1)²/2", "1 + (x − 1) − (x − 1)²/2", "(x − 1) − (x − 1)²", "f(1)=0, f′(1)=1, f″(1)=−1."],
+["Du vill approximera ln(6/5) med ln(1 + x). Vilket x?", "x = 1/5", "x = 6/5", "x = 1/6", "x = 5", "6/5 = 1 + 1/5. Samma knep för ln(3/2) och ln 2."]
+]);
+
+add("lim", [
+["lim_{x→0} sin x / x = ?", "1", "0", "∞", "1/2", ""],
+["lim_{x→0} (1 − cos x)/x² = ?", "1/2", "1", "0", "2", "Taylor: 1 − cos x = x²/2 − …"],
+["lim_{x→0} (e^{x} − 1)/x = ?", "1", "0", "e", "∞", "Derivatan av e^x i 0."],
+["lim_{x→0} ln(1 + x)/x = ?", "1", "0", "e", "∞", ""],
+["lim_{x→0} arctan x / x = ?", "1", "0", "π/2", "∞", ""],
+["lim_{x→0} tan x / x = ?", "1", "0", "∞", "1/2", ""],
+["lim_{x→0} (1 − cos x)/x = ?", "0", "1/2", "1", "∞", "Täljaren är ungefär x²/2, nämnaren x."],
+["lim_{x→0⁺} x ln x = ?", "0", "−∞", "1", "∞", "Potens vinner över logaritm."],
+["lim_{x→∞} e^{x}/x^{100} = ?", "∞", "0", "1", "100!", "Exponentialfunktionen vinner över alla polynom."],
+["lim_{x→∞} ln x / x = ?", "0", "∞", "1", "−∞", ""],
+["lim_{x→∞} x e^{−x} = ?", "0", "∞", "1", "−∞", "Samma sak som x/e^x."],
+["lim_{n→∞} (1 + 1/n)^{n} = ?", "e", "1", "∞", "1/e", ""],
+["lim_{x→∞} arctan x = ?", "π/2", "π", "1", "∞", ""],
+["lim_{x→∞} sin x / x = ?", "0", "1", "∞", "Existerar inte", "Täljaren är begränsad, nämnaren växer. Inklämning."],
+["lim_{x→∞} (x + cos 3x)/(2x + sin x) = ?", "1/2", "1", "2", "0", "Dela med x: cos(3x)/x → 0. Tenta 2025-06."],
+["lim_{x→0} sin 3x / tan 4x = ?", "3/4", "4/3", "3", "1", "Standardgränsvärdet för både sin och tan. Tenta 2024-06."],
+["lim_{x→0} (e^{x²} − cos x)/x² = ?", "3/2", "1/2", "1", "2", "Taylor: täljaren x² + x²/2. Tenta 2025-01."],
+["lim_{x→0} (x − sin x)/x³ = ?", "1/6", "1/3", "1/2", "1/24", "x − sin x = x³/6 − …"],
+["lim_{x→0} (e^{x} − 1 − x)/x² = ?", "1/2", "1", "1/6", "0", ""],
+["lim_{x→0} (2 cos x − 2 + x²)/x⁴ = ?", "1/12", "1/6", "1/24", "1/2", "2cos x = 2 − x² + x⁴/12 − … Tenta 2016-10."],
+["lim_{x→0} ln(cos x)/x = ?", "0", "−1/2", "1", "−∞", "ln(cos x) ≈ −x²/2, delat med x går mot 0. Tenta 2024-03."],
+["lim_{x→0} (e^{sin x} − 1 − x)/ln(1 + x²) = ?", "1/2", "1", "0", "2", "Täljare ≈ x²/2, nämnare ≈ x². Tenta 2018-06."],
+["Vilken växer snabbast när x → ∞?", "e^{x}", "x^{100}", "ln x", "x ln x", "ln x ≪ potens ≪ exponentialfunktion."],
+["När får man använda l’Hôpital?", "Vid 0/0 eller ∞/∞, om derivatakvoten har gränsvärde", "Alltid", "Bara när funktionerna är polynom", "Bara vid ∞ − ∞", "Och bara om gränsvärdet av derivatakvoten faktiskt existerar."],
+["lim_{x→0} sin 2x / x = ?", "2", "1", "1/2", "0", "sin 2x/(2x) → 1, så kvoten blir 2."],
+["lim_{n→∞} (√(n² + n + 1) − n) = ?", "1/2", "0", "1", "∞", "Förläng med konjugatet: (n + 1)/(√(n²+n+1) + n)."]
+]);
+/* Frågebank del C: metodval för integraler, serier och generaliserade integraler */
+
+add("met", [
+["∫ x e^{x} dx — vilken metod?", "Partiell integration", "Substitution", "Partialbråk", "Trig-omskrivning", "Polynom gånger exponentialfunktion: derivera polynomet tills det försvinner."],
+["∫ x e^{x²} dx — vilken metod?", "Substitution u = x²", "Partiell integration", "Partialbråk", "Kvadratkomplettering", "Faktorn x är nästan derivatan av x²."],
+["∫ ln x dx — vilken metod?", "Partiell integration med 1 · ln x", "Substitution u = ln x", "Partialbråk", "Polynomdivision", "Trick: skriv ln x som 1 · ln x."],
+["∫ arctan x dx — vilken metod?", "Partiell integration med 1 · arctan x", "Substitution u = arctan x", "Partialbråk", "Kvadratkomplettering", "Samma trick som för ln x och arcsin x."],
+["∫ 5/(x² + x − 6) dx — vilken metod?", "Partialbråk", "Partiell integration", "Substitution u = x²", "Kvadratkomplettering", "Nämnaren faktoriseras (x + 3)(x − 2). Tenta 2023-03."],
+["∫ cos x/(1 + sin²x) dx — vilken metod?", "Substitution u = sin x", "Partialbråk", "Partiell integration", "Polynomdivision", "Täljaren är derivatan av sin x."],
+["∫ tan x dx — vilken metod?", "Substitution u = cos x", "Partiell integration", "Partialbråk", "Kvadratkomplettering", "Skriv tan x = sin x / cos x."],
+["∫ e^{x}/(1 + e^{x}) dx — vilken metod?", "Substitution u = 1 + e^{x}", "Partiell integration", "Partialbråk", "Trig-omskrivning", "Täljaren är derivatan av nämnaren."],
+["∫ (ln x)³/x dx — vilken metod?", "Substitution u = ln x", "Partiell integration", "Partialbråk", "Polynomdivision", "du = dx/x finns redan i integranden."],
+["∫ e^{3x} sin 2x dx — vilken metod?", "Partiell integration två gånger", "Substitution u = 3x", "Partialbråk", "Trig-omskrivning", "Cyklisk: samma integral dyker upp igen, lös ut den. Tenta 2017-10."],
+["∫ sin²x dx — vilken metod?", "Omskrivning med dubbla vinkeln", "Partialbråk", "Substitution u = x²", "Kvadratkomplettering", "sin²x = (1 − cos 2x)/2."],
+["∫ x² cos x dx — vilken metod?", "Partiell integration två gånger", "Substitution u = x²", "Partialbråk", "Trig-omskrivning", "Tenta 2016-06."],
+["∫ 1/(x² + 2x + 5) dx — vilken metod?", "Kvadratkomplettering, sedan arctan", "Partialbråk", "Partiell integration", "Substitution u = x²", "(x + 1)² + 4 ger arctan-formen."],
+["∫ 1/(x² − 5x + 6) dx — vilken metod?", "Partialbråk", "Kvadratkomplettering", "Partiell integration", "Substitution u = x²", "Nämnaren har reella rötter 2 och 3."],
+["∫ (x³ + 2x² − 4x − 1)/(x² − 1) dx — vilken metod?", "Polynomdivision, sedan partialbråk", "Partialbråk direkt", "Partiell integration", "Substitution u = x²", "Täljarens grad är högre än nämnarens. Tenta 2019-03."],
+["∫ √(1 − x²/4) dx — vilken metod?", "Substitution x = 2 sin t", "Partialbråk", "Partiell integration", "Polynomdivision", "1 − sin²t = cos²t tar bort roten. Tenta 2018-06."],
+["∫ cos³x sin x dx — vilken metod?", "Substitution u = cos x", "Partialbråk", "Partiell integration två gånger", "Omskrivning med dubbla vinkeln", "Tenta 2017-10."],
+["∫ √x ln x dx — vilken metod?", "Partiell integration", "Substitution u = √x", "Partialbråk", "Trig-omskrivning", "Polynom gånger ln: välj u = ln x, v′ = √x. Tenta 2015-10."],
+["∫ 1/(x ln x) dx — vilken metod?", "Substitution u = ln x", "Partiell integration", "Partialbråk", "Kvadratkomplettering", ""],
+["∫ x/√(1 − x²) dx — vilken metod?", "Substitution u = 1 − x²", "Partiell integration", "Partialbråk", "Trig-omskrivning", ""],
+["∫ x · sin x dx — vilken metod?", "Partiell integration", "Substitution u = sin x", "Partialbråk", "Polynomdivision", "Produkt av olika sorters funktioner."],
+["Rationell funktion där täljarens grad ≥ nämnarens grad. Första steget?", "Polynomdivision", "Partialbråk direkt", "Partiell integration", "Substitution u = x²", "Först efter divisionen blir resten ett äkta bråk."],
+["Nämnaren har komplexa rötter (ingen reell faktorisering). Då använder du …", "Kvadratkomplettering och arctan", "Partialbråk med reella faktorer", "Polynomdivision", "Partiell integration", "Exempel: x² + 2x + 5."]
+]);
+
+add("ser", [
+["∫_{1}^{∞} x^{−p} dx konvergerar när …", "p > 1", "p < 1", "p ≥ 1", "alla p > 0", "Gränsen går mellan 1/x (divergerar) och 1/x² (konvergerar)."],
+["∫_{0}^{1} x^{−p} dx konvergerar när …", "p < 1", "p > 1", "p ≤ 1", "alla p", "Singularitet i 0: 1/√x går bra, 1/x gör det inte."],
+["Σ 1/n^{p} (n = 1, 2, …) konvergerar när …", "p > 1", "p < 1", "p ≥ 1", "p > 0", "Samma gräns som för integralen."],
+["∫_{2}^{∞} 1/(x (ln x)^{p}) dx konvergerar när …", "p > 1", "p < 1", "p ≥ 1", "alla p", "u = ln x ger ∫ u^{−p} du. Tenta 2020-06."],
+["Harmoniska serien Σ 1/n …", "divergerar", "konvergerar mot 1", "konvergerar mot ln 2", "konvergerar långsamt", "Termerna går mot 0, men det räcker inte."],
+["Σ_{k=0}^{∞} r^{k} = ?  (|r| < 1)", "1/(1 − r)", "1/(1 + r)", "r/(1 − r)", "1 − r", "Geometrisk serie. Börjar serien vid k = 1 blir det r/(1 − r)."],
+["Σ_{n=0}^{∞} (1/2)^{n} = ?", "2", "1", "1/2", "∞", "1/(1 − 1/2)."],
+["Σ_{n=1}^{∞} (2/3)^{n} = ?", "2", "3", "2/3", "1/3", "Första termen 2/3, kvot 2/3: (2/3)/(1/3)."],
+["Om Σ a_{n} konvergerar måste …", "a_{n} → 0", "a_{n} vara avtagande", "a_{n} > 0", "Σ |a_{n}| konvergera", "Nödvändigt villkor, men inte tillräckligt."],
+["Räcker det att a_{n} → 0 för att Σ a_{n} ska konvergera?", "Nej, t.ex. Σ 1/n", "Ja", "Ja, om a_{n} > 0", "Ja, om a_{n} avtar", "Σ 1/n har positiva, avtagande termer och divergerar ändå."],
+["0 ≤ a_{n} ≤ b_{n} och Σ b_{n} konvergerar. Då …", "konvergerar Σ a_{n}", "divergerar Σ a_{n}", "divergerar Σ b_{n}", "kan inget sägas", "Jämförelsesatsen, uppåt begränsad."],
+["0 ≤ b_{n} ≤ a_{n} och Σ b_{n} divergerar. Då …", "divergerar Σ a_{n}", "konvergerar Σ a_{n}", "konvergerar Σ b_{n}", "kan inget sägas", "Jämförelsesatsen, nedåt begränsad."],
+["Integralkriteriet: f är positiv och avtagande. Då …", "konvergerar Σ f(n) och ∫ f precis samtidigt", "är Σ f(n) = ∫ f", "konvergerar Σ f(n) alltid", "konvergerar ∫ f alltid", "Summan och integralen har inte samma värde, bara samma beteende."],
+["Kvotkriteriet: lim |a_{n+1}/a_{n}| < 1. Då …", "konvergerar serien", "divergerar serien", "kan inget sägas", "konvergerar den bara villkorligt", ""],
+["Kvotkriteriet: lim |a_{n+1}/a_{n}| = 1. Då …", "kan inget sägas", "konvergerar serien", "divergerar serien", "är serien geometrisk", "Testet ger ingenting vid 1. Prova jämförelse eller integralkriteriet."],
+["Σ k/e^{k} är …", "Konvergent (kvotkriteriet, kvoten → 1/e)", "Divergent (termerna växer)", "Divergent (som harmoniska serien)", "Konvergent (alternerande)", "Tenta 2022-03."],
+["∫_{1}^{∞} sin²x/x² dx är …", "Konvergent (≤ 1/x²)", "Divergent (som ∫ 1/x)", "Divergent (sin² saknar gränsvärde)", "Konvergent (sin² → 0)", "Jämför med 1/x². Tenta 2017-01."],
+["∫_{0}^{1} dx/(x + √x) är …", "Konvergent (nära 0 ≈ 1/√x)", "Divergent (nära 0 ≈ 1/x)", "Divergent (singularitet i x = 1)", "Lika med 0", "x är försumbar mot √x nära 0. Tenta 2022-03."],
+["∫_{0}^{1} sin x/x² dx är …", "Divergent (≈ 1/x nära 0)", "Konvergent (sin x är begränsad)", "Konvergent (≈ 1/√x nära 0)", "Lika med 0", "sin x ≈ x, alltså beter sig integranden som 1/x. Tenta 2023-03."],
+["∫_{0}^{1} e^{1/x} dx är …", "Divergent", "Konvergent", "Lika med e", "Lika med e − 1", "e^{1/x} växer snabbare än varje 1/x^p. Tenta 2024-01."],
+["Σ cos(1/n) är …", "Divergent (termerna → 1)", "Konvergent (cos är begränsad)", "Konvergent (termerna → 0)", "Konvergent (jämför med 1/n²)", "Termerna går mot 1, inte 0. Tenta 2023-10."],
+["Σ sin(1/n)/n är …", "Konvergent (≈ 1/n²)", "Divergent (som harmoniska serien)", "Divergent (termerna → 0 räcker inte)", "Lika med 0", "sin(1/n) ≈ 1/n. Tenta 2023-10."],
+["Σ (2 + sin n)/(n² + √n) är …", "Konvergent (≤ 3/n²)", "Divergent (sin n alternerar)", "Divergent (≈ 1/n)", "Konvergent (alternerande serie)", "Täljaren ≤ 3 och nämnaren ≥ n². Tenta 2019-01."],
+["∫_{2}^{∞} dx/√(x³ − 1) är …", "Konvergent (≈ x^{−3/2})", "Divergent (som 1/x)", "Divergent (p = 3/2 < 1)", "Konvergent (p = 1/2)", "För stora x ≈ 1/x^{3/2}, och 3/2 > 1. Tenta 2018-01."],
+["∫_{1}^{∞} dx/x² = ?", "1", "∞", "1/2", "2", ""],
+["∫_{0}^{1} dx/√x = ?", "2", "1", "∞", "1/2", "Primitiv funktion 2√x."],
+["∫_{0}^{∞} e^{−x} dx = ?", "1", "∞", "0", "e", ""],
+["∫_{−1}^{1} dx/x² = ?", "Divergent (singularitet i 0)", "−2", "2", "0", "Räkna inte −1/x rakt över singulariteten. Tenta 2017-03."],
+["Summa mot integral, f positiv och avtagande. Vilken olikhet gäller?", "∫_{1}^{n+1} f ≤ Σ_{k=1}^{n} f(k) ≤ f(1) + ∫_{1}^{n} f", "∫_{1}^{n} f ≥ Σ_{k=1}^{n} f(k)", "Σ_{k=1}^{n} f(k) = ∫_{1}^{n} f", "Σ_{k=1}^{n} f(k) ≤ ∫_{1}^{n} f", "Rita rektanglar över och under grafen. Återkommer i svåra Del C-uppgifter."],
+["lim_{n→∞} (1/n) Σ_{k=1}^{n} f(k/n) = ?", "∫_{0}^{1} f(x) dx", "∫_{0}^{n} f(x) dx", "f(1)", "Σ f(k)", "Riemannsumma. Kom på bl.a. tenta 2015-10, 2016-10 och 2019-10."],
+["lim_{n→∞} Σ_{k=1}^{n} (k/n²) arctan(k/n) = ?", "∫_{0}^{1} x arctan x dx", "∫_{0}^{1} arctan x dx", "∫_{0}^{1} x² arctan x dx", "arctan 1", "Skriv (1/n) · (k/n) · arctan(k/n). Tenta 2015-10."]
+]);
+/* Frågebank del D: differentialekvationer, teori och bevis, tillämpningar */
+
+add("ode", [
+["y″ + 5y′ + 6y = 0. Karakteristisk ekvation?", "r² + 5r + 6 = 0", "r² − 5r + 6 = 0", "r + 5 + 6 = 0", "r³ + 5r + 6 = 0", "y″ → r², y′ → r, y → 1."],
+["y″ + 5y′ + 6y = 0 har lösningen …", "C₁e^{−2t} + C₂e^{−3t}", "C₁e^{2t} + C₂e^{3t}", "(C₁ + C₂t)e^{−2t}", "e^{−2t}(C₁ cos 3t + C₂ sin 3t)", "Rötterna är −2 och −3 (två olika reella rötter)."],
+["y″ + 2y′ + y = 0 har lösningen …", "(C₁ + C₂t) e^{−t}", "C₁e^{−t} + C₂e^{t}", "C₁e^{−t} + C₂e^{−2t}", "e^{−t}(C₁ cos t + C₂ sin t)", "Dubbelrot r = −1: lägg till faktorn t."],
+["y″ + 2y′ + 2y = 0 har lösningen …", "e^{−t}(C₁ cos t + C₂ sin t)", "e^{−t}(C₁ cos 2t + C₂ sin 2t)", "C₁e^{−t} + C₂e^{−2t}", "e^{t}(C₁ cos t + C₂ sin t)", "r = −1 ± i. Reella delen α = −1, imaginära β = 1."],
+["y″ + 2y′ + 5y = 0 har lösningen …", "e^{−t}(C₁ cos 2t + C₂ sin 2t)", "e^{−t}(C₁ cos t + C₂ sin t)", "C₁e^{−t} + C₂e^{−5t}", "e^{t}(C₁ cos 2t + C₂ sin 2t)", "r = −1 ± 2i."],
+["y″ + 4y = 0 har lösningen …", "C₁ cos 2t + C₂ sin 2t", "C₁e^{2t} + C₂e^{−2t}", "(C₁ + C₂t)e^{2t}", "C₁ cos 4t + C₂ sin 4t", "r = ±2i."],
+["y″ − y = 0 har lösningen …", "C₁e^{t} + C₂e^{−t}", "C₁ cos t + C₂ sin t", "(C₁ + C₂t)e^{t}", "C₁e^{t}", "r = ±1."],
+["r² + 15r + 50 = 0 har rötterna …", "−5 och −10", "5 och 10", "−3 och −12", "−2 och −25", "Summan −15, produkten 50. Tenta 2016-10."],
+["y″ − 4y′ + 3y = 6. Partikulärlösning?", "y_{p} = 2", "y_{p} = 6", "y_{p} = 3", "y_{p} = 2t", "Konstant ansats: 3A = 6. Tenta 2022-01."],
+["y″ − y′ − 2y = 12e^{−t}. Vilken ansats?", "y_{p} = A t e^{−t}", "y_{p} = A e^{−t}", "y_{p} = A t² e^{−t}", "y_{p} = A cos t + B sin t", "−1 är rot till r² − r − 2 = (r − 2)(r + 1). Resonans: multiplicera med t. Tenta 2019-03."],
+["y″ − y′ − 2y = 12e^{−t} med y_{p} = A t e^{−t}. A = ?", "−4", "4", "−3", "−12", "y_{p}′ = A e^{−t}(1 − t), y_{p}″ = A e^{−t}(t − 2). Insatt blir vänsterledet −3A e^{−t}."],
+["Ansats när högerledet är 5 cos t", "y_{p} = A cos t + B sin t", "y_{p} = A cos t", "y_{p} = A e^{t}", "y_{p} = A t cos t", "Ta alltid med både cos och sin (om inte ±i är rötter)."],
+["Ansats när högerledet är t (polynom av grad 1) och 0 inte är rot", "y_{p} = At + B", "y_{p} = A", "y_{p} = At²", "y_{p} = A e^{t}", "Polynom ger polynom av samma grad. Ta med alla lägre termer."],
+["Allmän lösning till y″ + ay′ + by = f(t)", "homogen lösning + en partikulärlösning", "bara partikulärlösningen", "bara den homogena lösningen", "produkten av dem", ""],
+["y′ = k(y − 10). Lösning?", "y = 10 + C e^{kt}", "y = C e^{kt}", "y = 10 e^{kt}", "y = 10 + kt", "Sätt u = y − 10, då är u′ = ku."],
+["y′ = ky och halveringstiden är T. Vad är k?", "k = −ln 2 / T", "k = ln 2 / T", "k = −T / ln 2", "k = −1/T", "e^{kT} = 1/2."],
+["Kol-14 (halveringstid 5730 år): 80 % kvar. Åldern är ungefär …", "1850 år", "1150 år", "2870 år", "4580 år", "t = 5730 · ln 0,8 / ln 0,5 ≈ 5730 · 0,322. Tenta 2017-06 och 2024-01."],
+["Newtons avsvalning: y′ = k(y − y_{omg}). Lösning?", "y = y_{omg} + (y₀ − y_{omg}) e^{kt}", "y = y₀ e^{kt}", "y = y_{omg} e^{kt}", "y = y₀ + (y₀ − y_{omg}) e^{kt}", "k är negativ. Temperaturen går mot omgivningens."],
+["lim_{t→0} y(t)/t = 7 ger …", "y(0) = 0 och y′(0) = 7", "y(0) = 7", "y′(0) = 0", "y(0) = 7 och y′(0) = 0", "Utan y(0) = 0 går kvoten mot ±∞. Tenta 2021-03 och 2024-10."],
+["y = C₁e^{2t} + C₂e^{−t} och lim_{t→∞} y = 0. Då är …", "C₁ = 0", "C₂ = 0", "C₁ = C₂", "C₁ = −C₂", "Termer med växande exponent måste bort. Mönstret kom 2019-03, 2020-10 och 2022-01."],
+["e^{αt} cos βt med α < 0. Vad händer när t → ∞?", "Går mot 0", "Går mot ∞", "Svänger oförändrat", "Går mot 1", "Dämpad svängning. Tenta 2015-10 frågade efter detta (laddningen efter lång tid)."]
+]);
+
+add("teo", [
+["Definiera: f är kontinuerlig i a", "lim_{x→a} f(x) = f(a)", "f(a) existerar", "f′(a) existerar", "f är begränsad nära a", "Tre krav: f(a) finns, gränsvärdet finns, de är lika."],
+["Definiera: derivatan f′(a)", "lim_{h→0} (f(a + h) − f(a))/h", "lim_{h→0} (f(a + h) + f(a))/h", "lim_{h→∞} (f(a + h) − f(a))/h", "lim_{h→0} (f(a) − f(a + h))/h", "Gränsvärdet av differenskvoten. Tentorna säger 'använd definitionen' och menar detta."],
+["Deriverbar i a medför …", "kontinuerlig i a", "f′ kontinuerlig i a", "f″(a) existerar", "f(a) = 0", "Omvändningen gäller inte: |x| är kontinuerlig men inte deriverbar i 0."],
+["Exempel på funktion som är kontinuerlig men inte deriverbar i 0", "|x|", "x²", "1/x", "e^{x}", "Hörn i origo: höger- och vänsterderivata är 1 och −1."],
+["Definiera: a är en lokal maxpunkt", "f(x) ≤ f(a) för alla x nära a", "f′(a) = 0", "f(x) ≥ f(a) för alla x nära a", "f(x) < f(a) för alla x", "Lokalt, inte globalt."],
+["Fermats sats: lokal extrempunkt a i inre punkt, f deriverbar i a. Då …", "f′(a) = 0", "f″(a) = 0", "f′(a) > 0", "f(a) = 0", "Visa med att höger- och vänsterdifferenskvoten har olika tecken."],
+["f′(a) = 0 medför att a är en extrempunkt?", "Nej, t.ex. f(x) = x³ i 0", "Ja, alltid", "Ja, om f är deriverbar", "Ja, om f är kontinuerlig", "x³ har f′(0) = 0 men växer hela vägen."],
+["Extrempunkt utan att f′ är 0, exempel", "|x| i x = 0", "x³ i x = 0", "x² i x = 0", "sin x i x = π", "Derivatan saknas i hörnet, men x = 0 är minpunkt."],
+["Satsen om mellanliggande värden: f kontinuerlig på [a, b], f(a) < 0 < f(b). Då …", "finns c i (a, b) med f(c) = 0", "är f växande", "är f deriverbar", "finns precis ett c med f(c) = 0", "Ger existens, inte entydighet. Entydighet kräver monotoni."],
+["Extremvärdessatsen: f kontinuerlig på slutet, begränsat intervall. Då …", "antar f både största och minsta värde", "antar f bara största värdet", "är f deriverbar", "är f konstant", "Båda villkoren på intervallet behövs."],
+["Rolles sats: f(a) = f(b), kontinuerlig på [a, b], deriverbar på (a, b). Då …", "finns c med f′(c) = 0", "är f konstant", "är f′ kontinuerlig", "finns c med f(c) = 0", ""],
+["Medelvärdessatsen", "f(b) − f(a) = f′(c)(b − a) för något c i (a, b)", "f(b) − f(a) = f′(c)(b + a)", "f(b) + f(a) = f′(c)(b − a)", "f(b) − f(a) = f′(b)(b − a)", "Bevis: Rolles sats på f minus linjen genom ändpunkterna."],
+["f′(x) = 0 för alla x. Då är f konstant. Vilken sats bevisar det?", "Medelvärdessatsen", "Extremvärdessatsen", "Satsen om mellanliggande värden", "Taylors formel", "f(x) − f(0) = f′(c)·x = 0."],
+["f′(x) > 0 på ett intervall medför att f är …", "strängt växande", "konstant", "konkav", "inte inverterbar", "Följer av medelvärdessatsen. Ger också att f är inverterbar."],
+["Hur visar man att ekvationen f(x) = 0 har exakt en lösning?", "Existens med mellanliggande värden, entydighet med strängt monoton f", "Bara mellanliggande värden", "Bara f′(x) = 0", "Lös ekvationen algebraiskt", "Skriv båda delarna. Mallen kom på ungefär var tredje tenta."],
+["Analysens fundamentalsats: F(x) = ∫_{a}^{x} f(t) dt, f kontinuerlig. Då …", "F′(x) = f(x)", "F′(x) = f′(x)", "F(x) = f(x)", "F′(x) = f(x) − f(a)", ""],
+["∫_{a}^{b} f(x) dx = ?  (F är en primitiv funktion)", "F(b) − F(a)", "F(a) − F(b)", "F(b) + F(a)", "f(b) − f(a)", ""],
+["Partiell integration", "∫ f g′ dx = f g − ∫ f′ g dx", "∫ f g′ dx = f g + ∫ f′ g dx", "∫ f g′ dx = f′ g − ∫ f g′ dx", "∫ f g′ dx = f g′ − ∫ f′ g dx", "Kommer från produktregeln. Bevisas ofta på Del C."],
+["Substitution: ∫ f(g(x)) g′(x) dx = ?", "∫ f(u) du med u = g(x)", "∫ f(u) g′(u) du", "f(g(x))", "∫ f(g(x)) dx", "Kommer från kedjeregeln."],
+["f′(x) > 0 överallt medför att f är …", "inverterbar", "begränsad", "konvex", "positiv", "Strängt växande funktioner är injektiva."],
+["Sned asymptot y = kx + m. Hur räknar du ut k och m?", "k = lim f(x)/x, m = lim (f(x) − kx)", "k = lim f(x), m = lim f(x)/x", "k = f′(0), m = f(0)", "k = lim x/f(x), m = lim (f(x) + kx)", "Samma sak gäller för x → −∞."],
+["f är jämn om …", "f(−x) = f(x)", "f(−x) = −f(x)", "f(x) = 0", "f(x + 2π) = f(x)", "Udda är f(−x) = −f(x). cos är jämn, sin är udda."],
+["Bevis: deriverbar ⇒ kontinuerlig. Nyckelsteget?", "f(a+h) − f(a) = [(f(a+h) − f(a))/h] · h → f′(a) · 0 = 0", "Använd medelvärdessatsen", "Använd Fermats sats", "Derivera båda led", "Skriv om skillnaden som differenskvot gånger h."],
+["Bevis av produktregeln. Nyckelsteget?", "Addera och subtrahera f(x+h)g(x) i täljaren", "Använd kedjeregeln", "Använd partiell integration", "Dela med f(x)g(x)", "Då delar täljaren upp sig i två differenskvoter."],
+["Bevis av fundamentalsatsen. Nyckelsteget?", "(A(x+h) − A(x))/h ligger mellan min och max av f på [x, x+h]", "Derivera f", "Använd Rolles sats", "Dela intervallet i n lika bitar", "Inklämning när h → 0 och f är kontinuerlig. Tenta 2017-01."],
+["Bevis av Fermats sats. Nyckelsteget?", "Högerkvoten ≤ 0 och vänsterkvoten ≥ 0, så gränsvärdet är 0", "Medelvärdessatsen", "Taylorutveckla till grad 2", "Partiell integration", "Tenta 2016-03 och 2025-01 (del a)."]
+]);
+
+add("app", [
+["Volym vid rotation kring x-axeln (skivmetoden)", "V = π ∫ f(x)² dx", "V = 2π ∫ x f(x) dx", "V = π ∫ f(x) dx", "V = ∫ f(x)² dx", "Varje skiva har area π · radie²."],
+["Volym vid rotation kring y-axeln (skalmetoden)", "V = 2π ∫ x f(x) dx", "V = π ∫ f(x)² dx", "V = 2π ∫ f(x) dx", "V = π ∫ x f(x) dx", "Cylinderskal: omkrets 2πx, höjd f(x), tjocklek dx."],
+["Båglängd av y = f(x) från a till b", "L = ∫ √(1 + f′(x)²) dx", "L = ∫ (1 + f′(x)²) dx", "L = ∫ √(1 + f(x)²) dx", "L = ∫ f′(x) dx", "Pythagoras på ett litet kurvstycke."],
+["Area mellan två kurvor", "∫ (övre − undre) dx", "∫ (övre + undre) dx", "∫ övre dx · ∫ undre dx", "(övre − undre) i ändpunkterna", "Hitta skärningspunkterna först."],
+["Massa av en kropp med densitet ρ(y) och tvärsnittsarea A(y)", "m = ∫ ρ(y) A(y) dy", "m = ρ · V", "m = ∫ ρ(y) dy", "m = ∫ A(y) dy", "Tenta 2025-06: konen med densitet 2 − y."],
+["Kandidater till största och minsta värde på [a, b]", "f′ = 0, ändpunkter och punkter där f′ saknas", "bara f′ = 0", "bara ändpunkterna", "bara f″ = 0", "Kontrollera alla tre typerna och jämför värdena."],
+["Linjär approximation av f nära a", "f(x) ≈ f(a) + f′(a)(x − a)", "f(x) ≈ f(a) + f″(a)(x − a)²", "f(x) ≈ f′(a)(x − a)", "f(x) ≈ f(a) · f′(a)", "Samma som tangenten."],
+["Felgräns för linjär approximation, |f″| ≤ M", "|E| ≤ M/2 · (x − a)²", "|E| ≤ M · |x − a|", "|E| ≤ M/6 · (x − a)³", "|E| ≤ M (x − a)²", "Faktorn 1/2 kommer från f″/2!."],
+["Implicit derivering: d/dx y² där y = y(x)", "2y · y′", "2y", "2y′", "y² · y′", "Kedjeregeln. Samla sedan alla y′-termer."],
+["Parametrisera x²/4 + y²/9 = 1", "x = 2 cos t, y = 3 sin t", "x = 4 cos t, y = 9 sin t", "x = 3 cos t, y = 2 sin t", "x = cos t, y = sin t", "Halvaxlarna är 2 och 3. Tenta 2021-01."],
+["Största rektangel (sidor ∥ axlarna) i x²/a² + y²/b² = 1 har arean", "2ab", "πab", "4ab", "ab", "Area 4xy = 2ab sin 2t, med maximum 2ab. Tenta 2017-01."],
+["Arean av en ellips med halvaxlarna a och b", "πab", "2πab", "π(a + b)", "πa²b²", "Visas genom att integrera b√(1 − x²/a²). Tenta 2017-06."],
+["Undersumma för en växande funktion på [a, b] med n lika delar", "Σ f(x_{k−1}) · Δx", "Σ f(x_{k}) · Δx", "Σ (f(x_{k−1}) + f(x_{k}))/2 · Δx", "f(a) · n", "Minsta värdet på varje delintervall är vänsterpunkten. Tenta 2020-03 och 2025-03."]
+]);
+/* Tentajakt: spelmotor */
+(function () {
+  "use strict";
+
+  var ZONES = [
+    { id: "trig", n: "Trig-hörnet", sub: "Exakta värden, identiteter, arcus", w: "Grund för allt" },
+    { id: "der", n: "Derivatfabriken", sub: "Standardderivator och regler", w: "Grund för allt" },
+    { id: "prim", n: "Primitiva-gruvan", sub: "Standardintegraler och knep", w: "Integraler ≈ 15 %" },
+    { id: "met", n: "Metodvalet", sub: "Vilken integralmetod passar?", w: "Integraler ≈ 15 %" },
+    { id: "mac", n: "Maclaurin-labbet", sub: "Serier, Taylor och felgränser", w: "Taylor ≈ 7 %" },
+    { id: "lim", n: "Gränsvärdesjakten", sub: "Standardgränser och Taylor-trick", w: "Gränsvärden ≈ 12 %" },
+    { id: "ser", n: "Konvergensdjungeln", sub: "Serier och generaliserade integraler", w: "≈ 17 % av tentan" },
+    { id: "ode", n: "ODE-verkstan", sub: "Rötter, ansatser, sönderfall", w: "ODE ≈ 8 %" },
+    { id: "teo", n: "Teori och bevis", sub: "Definitioner och satser", w: "Teori ≈ 12 %" },
+    { id: "app", n: "Tillämpningar", sub: "Volym, båglängd, extremvärden", w: "≈ 7 % av tentan" }
+  ];
+  var TITLES = ["Förstaårsskräck", "Formelhamstrare", "Derivatör", "Primitivjägare", "Gränsvakt", "Taylorlärling", "Serieslukare", "ODE-tämjare", "Tentakrigare", "Docent"];
+  var ZN = {};
+  ZONES.forEach(function (z) { ZN[z.id] = z; });
+
+  function hash(s) { var h = 5381; for (var i = 0; i < s.length; i++) { h = ((h << 5) + h + s.charCodeAt(i)) | 0; } return (h >>> 0).toString(36); }
+  BANK.forEach(function (q) { q.id = q.z + "." + hash(q.q + "|" + q.a); });
+
+  /* ---------- lagring ---------- */
+  var KEY = "tentajakt.v1";
+  function blank() { return { xp: 0, stars: {}, q: {}, best: 0, days: 0, last: "", snd: 1, games: 0 }; }
+  function load() {
+    try { var r = localStorage.getItem(KEY); if (r) { return Object.assign(blank(), JSON.parse(r)); } } catch (e) { }
+    return blank();
+  }
+  var S = load();
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } }
+
+  /* ---------- hjälpare ---------- */
+  var app = document.getElementById("app");
+  function $(s) { return document.querySelector(s); }
+  function esc(c) { return c === "&" ? "&amp;" : c === "<" ? "&lt;" : c === ">" ? "&gt;" : c; }
+  function grab(s, i) {
+    var d = 1, j = i + 2;
+    while (j < s.length && d > 0) { var ch = s[j]; if (ch === "{") d++; else if (ch === "}") d--; j++; }
+    return { kind: s[i], inner: s.slice(i + 2, j - 1), end: j };
+  }
+  function R(s) {
+    var out = "", i = 0;
+    while (i < s.length) {
+      var c = s[i];
+      if ((c === "^" || c === "_") && s[i + 1] === "{") {
+        var a = grab(s, i), b = null, n = a.end;
+        if ((s[n] === "^" || s[n] === "_") && s[n] !== c && s[n + 1] === "{") { b = grab(s, n); }
+        if (b) {
+          var up = a.kind === "^" ? a : b, dn = a.kind === "_" ? a : b;
+          out += '<span class="ss"><sup>' + R(up.inner) + "</sup><sub>" + R(dn.inner) + "</sub></span>";
+          i = b.end;
+        } else {
+          out += (c === "^" ? "<sup>" : "<sub>") + R(a.inner) + (c === "^" ? "</sup>" : "</sub>");
+          i = a.end;
+        }
+      } else { out += esc(c); i++; }
+    }
+    return out;
+  }
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function ymd(d) { return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
+  function liveDays() {
+    var t = ymd(new Date()), y = ymd(new Date(Date.now() - 864e5));
+    return (S.last === t || S.last === y) ? S.days : 0;
+  }
+  function touchDay() {
+    var t = ymd(new Date()), y = ymd(new Date(Date.now() - 864e5));
+    if (S.last === t) return;
+    S.days = (S.last === y) ? S.days + 1 : 1; S.last = t;
+  }
+  function lvlInfo(xp) {
+    var l = Math.floor(Math.sqrt(xp / 50)) + 1, lo = 50 * (l - 1) * (l - 1), hi = 50 * l * l;
+    return { l: l, title: TITLES[Math.min(l - 1, TITLES.length - 1)], hi: hi, pct: Math.round(100 * (xp - lo) / (hi - lo)) };
+  }
+  function weakList() { return BANK.filter(function (q) { var r = S.q[q.id]; return r && r.w > 0 && r.b < 3; }); }
+  function mastered(z) { return BANK.filter(function (q) { var r = S.q[q.id]; return q.z === z && r && r.b >= 3; }).length; }
+  function inZone(z) { return BANK.filter(function (q) { return q.z === z; }); }
+  function wt(q) { var r = S.q[q.id]; if (!r) return 3; var w = 1; if (r.w > 0 && r.b < 3) w += 3; if (r.b >= 3) w = 0.4; return w; }
+  function pick(pool, n) {
+    var a = pool.slice(), out = [];
+    while (out.length < n && a.length) {
+      var tot = 0, k = 0; a.forEach(function (q) { tot += wt(q); });
+      var x = Math.random() * tot;
+      for (; k < a.length - 1; k++) { x -= wt(a[k]); if (x <= 0) break; }
+      out.push(a.splice(k, 1)[0]);
+    }
+    return out;
+  }
+
+  /* ---------- ljud ---------- */
+  var AC = null;
+  function ac() { try { if (!AC) { var C = window.AudioContext || window.webkitAudioContext; if (C) AC = new C(); } if (AC && AC.state === "suspended") AC.resume(); } catch (e) { } }
+  function tone(f, t, d, type, v) {
+    try {
+      if (!S.snd || !AC) return;
+      var o = AC.createOscillator(), g = AC.createGain(), s = AC.currentTime + t;
+      o.type = type || "sine"; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, s); g.gain.exponentialRampToValueAtTime(v || 0.12, s + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, s + d);
+      o.connect(g); g.connect(AC.destination); o.start(s); o.stop(s + d + 0.02);
+    } catch (e) { }
+  }
+  function sfx(k) {
+    if (k === "ok") { tone(660, 0, 0.09, "triangle"); tone(880, 0.07, 0.12, "triangle"); }
+    else if (k === "bad") { tone(160, 0, 0.22, "sawtooth", 0.09); }
+    else if (k === "lvl") { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, i * 0.09, 0.18, "triangle"); }); }
+  }
+  function flash(msg) {
+    var d = document.createElement("div"); d.className = "flash"; d.textContent = msg; document.body.appendChild(d);
+    setTimeout(function () { if (d.parentNode) d.parentNode.removeChild(d); }, 750);
+  }
+
+  /* ---------- startsida ---------- */
+  var G = null, resetArm = false;
+  function stars(n, big) {
+    var s = "";
+    for (var i = 1; i <= 3; i++) s += '<span class="' + (i <= n ? "on" : "off") + '">' + (i <= n ? "★" : "☆") + "</span>";
+    return '<span class="stars" aria-label="' + n + ' av 3 stjärnor">' + s + "</span>";
+  }
+  function home() {
+    G = null; resetArm = false;
+    var L = lvlInfo(S.xp), weak = weakList().length, days = liveDays(), h = "";
+    h += '<div class="top"><span class="chip hi">SF1625</span><button class="ghost" data-a="snd">Ljud: ' + (S.snd ? "på" : "av") + "</button></div>";
+    h += '<h1 class="brand">Tenta<mark>jakt</mark></h1>';
+    h += '<p class="lede">Formlerna som återkommer på tentorna. Svara snabbt, bygg combo, ta stjärnor.</p>';
+    h += '<div class="xp"><div class="xp-row"><span>Nivå ' + L.l + " · " + L.title + "</span><small>" + S.xp + " / " + L.hi + ' XP</small></div><div class="bar"><i style="width:' + L.pct + '%"></i></div></div>';
+    h += '<div class="stack">';
+    h += '<button class="btn primary" data-a="blixt"><span class="big">Blixt</span><small>60 sekunder, 3 liv. Rätt svar ger tid och combo. Rekord: ' + S.best + "</small></button>";
+    h += '<button class="btn" data-a="weak"><b>Svaga punkter</b><small>' + (weak ? weak + " frågor du har missat. Träna tills de sitter." : "Tom än. Missa något först, så dyker det upp här.") + "</small></button>";
+    h += '<button class="btn" data-a="cheat"><b>Fusklapp</b><small>Alla ' + BANK.length + " fakta som en lista att läsa före tentan.</small></button>";
+    h += "</div>";
+    h += '<div class="sec"><h2>Zoner</h2><span>10 frågor, 3 liv</span></div><div class="zones">';
+    ZONES.forEach(function (z) {
+      var tot = inZone(z.id).length, m = mastered(z.id);
+      h += '<button class="zone" data-a="zone" data-z="' + z.id + '"><b>' + z.n + '</b><span class="sub">' + z.sub + '</span><span class="meta"><span class="w">' + z.w + "</span>" + stars(S.stars[z.id] || 0) + '<span class="mini" title="Behärskade ' + m + " av " + tot + '"><i style="width:' + Math.round(100 * m / tot) + '%"></i></span></span></button>';
+    });
+    h += "</div>";
+    h += '<div class="foot"><span>' + (days ? days + (days === 1 ? " dag" : " dagar") + " i rad" : "Spela idag för att starta en svit") + '</span><button class="ghost" data-a="reset">Nollställ framsteg</button></div>';
+    app.innerHTML = h; window.scrollTo(0, 0);
+  }
+
+  /* ---------- spelet ---------- */
+  function mult() { return 1 + Math.min(4, Math.floor(G.streak / 3)); }
+  function startGame(mode, zid) {
+    if (mode === "weak" && !weakList().length) { flash("Inga svaga punkter ännu"); return; }
+    if (G && G.timer) clearInterval(G.timer);
+    G = { mode: mode, z: zid || null, lives: 3, streak: 0, bs: 0, score: 0, correct: 0, total: 0, miss: [], xp: 0, cur: null, locked: false, t: 60, n: 0, queue: [], asked: [], N: 0, timer: null, quitArm: false };
+    if (mode === "zone") { G.queue = pick(inZone(zid), 10); G.N = G.queue.length; }
+    if (mode === "weak") { G.queue = pick(weakList(), 12); G.N = G.queue.length; G.lives = 99; }
+    if (mode === "blixt") {
+      G.timer = setInterval(function () {
+        if (!G || G.locked) return;
+        G.t -= 0.1; var b = $("#tb"); if (b) { b.classList.toggle("low", G.t < 10); b.firstChild.style.width = Math.max(0, Math.min(100, G.t / 60 * 100)) + "%"; }
+        if (G.t <= 0) { G.t = 0; finish(false); }
+      }, 100);
+    }
+    nextQ();
+  }
+  function nextQ() {
+    if (G.mode === "blixt") {
+      var rec = G.asked.slice(-20);
+      var pool = BANK.filter(function (q) { return rec.indexOf(q.id) < 0; });
+      G.cur = pick(pool, 1)[0];
+    } else {
+      if (G.n >= G.queue.length) { finish(true); return; }
+      G.cur = G.queue[G.n];
+    }
+    G.n++;
+    G.opts = shuffle([G.cur.a].concat(G.cur.d)); G.ci = G.opts.indexOf(G.cur.a);
+    G.locked = false; G.asked.push(G.cur.id);
+    drawGame();
+  }
+  function pips() {
+    var s = ""; for (var i = 0; i < 3; i++) s += '<i class="pip' + (i < G.lives ? "" : " gone") + '"></i>';
+    return s;
+  }
+  function drawGame() {
+    var q = G.cur, h = "";
+    h += '<div class="hud"><button class="ghost" data-a="quit" id="qb">Avbryt</button>';
+    if (G.mode === "weak") h += '<span class="count">Träning</span>'; else h += '<div class="lives" id="lv">' + pips() + "</div>";
+    h += '<span class="combo" id="cmb">×' + mult() + '</span><span class="score" id="sc">' + G.score + "</span></div>";
+    if (G.mode === "blixt") h += '<div class="bar' + (G.t < 10 ? " low" : "") + '" id="tb"><i style="width:' + Math.min(100, G.t / 60 * 100) + '%"></i></div>';
+    else h += '<div class="bar" id="tb"><i style="width:' + Math.round(100 * (G.n - 1) / G.N) + '%"></i></div>';
+    h += '<div class="qcard"><span class="zn">' + ZN[q.z].n + (G.mode !== "blixt" ? " · " + G.n + "/" + G.N : "") + '</span><div class="qtext' + (q.q.length > 52 ? " long" : "") + '">' + R(q.q) + "</div></div>";
+    h += '<div class="opts">';
+    G.opts.forEach(function (o, i) { h += '<button class="opt' + (o.length > 36 ? " long" : "") + '" data-a="opt" data-i="' + i + '">' + R(o) + "</button>"; });
+    h += '</div><div id="fbbox"></div>';
+    app.innerHTML = h; window.scrollTo(0, 0);
+  }
+  function answer(i) {
+    if (!G || G.locked) return;
+    G.locked = true;
+    var q = G.cur, ok = (i === G.ci), r = S.q[q.id] || (S.q[q.id] = { b: 0, w: 0, s: 0 });
+    r.s++; G.total++;
+    var old = mult();
+    if (ok) {
+      G.streak++; G.correct++; G.bs = Math.max(G.bs, G.streak);
+      var m = mult(); G.score += 10 * m; G.xp += 4 * m; r.b = Math.min(4, r.b + 1);
+      if (G.mode === "blixt") G.t = Math.min(90, G.t + 2);
+      sfx("ok"); if (m > old) { flash("Combo ×" + m); }
+    } else {
+      G.streak = 0; r.w++; r.b = 0; G.miss.push(q); if (G.mode !== "weak") G.lives--; sfx("bad");
+    }
+    save();
+    Array.prototype.forEach.call(app.querySelectorAll(".opt"), function (b, k) {
+      b.disabled = true;
+      if (k === G.ci) b.classList.add("ok"); else if (k === i) b.classList.add("bad"); else b.classList.add("dim");
+    });
+    var cm = $("#cmb"), sc = $("#sc"), lv = $("#lv");
+    if (cm) { cm.textContent = "×" + mult(); cm.classList.remove("pop"); void cm.offsetWidth; cm.classList.add("pop"); }
+    if (sc) sc.textContent = G.score;
+    if (lv) lv.innerHTML = pips();
+    var over = G.mode !== "weak" && G.lives <= 0;
+    if (ok) {
+      setTimeout(function () { if (G && G.cur === q) advance(); }, 650);
+    } else {
+      var fb = '<div class="fb bad"><h3>Fel</h3><p>Rätt svar: <span class="ans">' + R(q.a) + "</span></p>" + (q.e ? "<p>" + R(q.e) + "</p>" : "") +
+        '<button class="btn primary center" data-a="next">' + (over ? "Se resultat" : "Nästa") + "</button></div>";
+      $("#fbbox").innerHTML = fb;
+      try { $("#fbbox").scrollIntoView({ block: "nearest", behavior: "smooth" }); } catch (e) { }
+    }
+  }
+  function advance() {
+    if (!G) return;
+    if (G.mode !== "weak" && G.lives <= 0) { finish(false); return; }
+    if (G.mode === "blixt" && G.t <= 0) { finish(false); return; }
+    nextQ();
+  }
+  function quit() {
+    if (!G) return;
+    var b = $("#qb");
+    if (!G.quitArm) { G.quitArm = true; if (b) b.textContent = "Säker? Tryck igen"; return; }
+    clearInterval(G.timer); S.xp += G.xp; save(); home();
+  }
+
+  /* ---------- resultat ---------- */
+  function finish(win) {
+    clearInterval(G.timer); G.timer = null; G.locked = true;
+    var st = 0, newBest = false;
+    if (G.mode === "zone") {
+      if (win && G.lives > 0) st = G.lives;
+      if (st > (S.stars[G.z] || 0)) S.stars[G.z] = st;
+      G.xp += st * 20;
+    }
+    if (G.mode === "blixt" && G.score > S.best) { S.best = G.score; newBest = G.score > 0; }
+    var before = lvlInfo(S.xp).l; S.xp += G.xp; var after = lvlInfo(S.xp);
+    touchDay(); S.games++; save();
+    var h = "", title;
+    if (G.mode === "zone") title = st ? "Zonen klar" : "Slut på liv";
+    else if (G.mode === "blixt") title = G.lives <= 0 ? "Slut på liv" : "Tiden är slut";
+    else title = "Träningen klar";
+    h += '<div class="hud"><button class="ghost" data-a="home">← Hem</button><span class="count">' + (G.mode === "zone" ? ZN[G.z].n : G.mode === "blixt" ? "Blixt" : "Svaga punkter") + "</span></div>";
+    h += '<div class="res"><span class="chip hi">' + title + "</span>";
+    if (G.mode === "blixt") h += '<div class="num pop">' + G.score + "</div><p>" + (newBest ? "Nytt rekord" : "Rekord: " + S.best) + "</p>";
+    else h += '<div class="num pop">' + G.correct + "/" + G.total + "</div>";
+    if (G.mode === "zone") h += stars(st).replace('class="stars"', 'class="stars" style="display:block"');
+    h += "</div>";
+    h += '<div class="tiles"><div class="tile"><b>' + G.correct + "/" + G.total + "</b><span>Rätt</span></div><div class=\"tile\"><b>×" + (1 + Math.min(4, Math.floor(G.bs / 3))) + "</b><span>Bästa combo</span></div><div class=\"tile\"><b>+" + G.xp + "</b><span>XP</span></div></div>";
+    if (after.l > before) { h += '<div class="lvl">Ny nivå: ' + after.title + " (nivå " + after.l + ")</div>"; sfx("lvl"); }
+    var seen = {}, uniq = G.miss.filter(function (q) { if (seen[q.id]) return false; seen[q.id] = 1; return true; });
+    h += '<div class="stack"><button class="btn primary center" data-a="again">Spela igen</button></div>';
+    if (uniq.length) {
+      h += '<h2 class="miss">Det här missade du</h2>';
+      uniq.forEach(function (q) { h += '<div class="row"><div class="q">' + R(q.q) + '</div><div class="a">' + R(q.a) + "</div>" + (q.e ? '<div class="e">' + R(q.e) + "</div>" : "") + "</div>"; });
+    } else if (G.total) {
+      h += '<p class="empty">Inga misstag. Bra.</p>';
+    }
+    app.innerHTML = h; window.scrollTo(0, 0);
+  }
+
+  /* ---------- fusklapp ---------- */
+  function cheat() {
+    G = null;
+    var h = '<div class="hud"><button class="ghost" data-a="home">← Hem</button><span class="count">' + BANK.length + " fakta</span></div>";
+    h += '<h1 class="brand" style="font-size:clamp(36px,11vw,48px)">Fusklapp</h1>';
+    h += '<input id="srch" class="search" type="search" placeholder="Sök, t.ex. arctan, Taylor, p-test" autocomplete="off" autocapitalize="off" spellcheck="false"><div id="cl"></div>';
+    app.innerHTML = h; window.scrollTo(0, 0); fillCheat("");
+  }
+  function fillCheat(term) {
+    term = term.trim().toLowerCase();
+    var out = "";
+    ZONES.forEach(function (z) {
+      var items = BANK.filter(function (q) { return q.z === z.id && (!term || (q.q + " " + q.a + " " + q.e).toLowerCase().indexOf(term) >= 0); });
+      if (!items.length) return;
+      out += '<details class="cz"' + (term ? " open" : "") + "><summary>" + z.n + "<span>" + items.length + '</span></summary><div class="body">';
+      items.forEach(function (q) {
+        var r = S.q[q.id], weak = r && r.w > 0 && r.b < 3;
+        out += '<div class="row"><div class="q">' + (weak ? '<i class="dot"></i>' : "") + R(q.q.replace(/\s*=\s*\?\s*$/, " =")) + '</div><div class="a">' + R(q.a) + "</div>" + (q.e ? '<div class="e">' + R(q.e) + "</div>" : "") + "</div>";
+      });
+      out += "</div></details>";
+    });
+    $("#cl").innerHTML = out || '<p class="empty">Inget matchar.</p>';
+  }
+
+  /* ---------- händelser ---------- */
+  app.addEventListener("click", function (e) {
+    var t = e.target.closest("[data-a]"); if (!t) return;
+    ac();
+    var a = t.getAttribute("data-a");
+    if (a === "blixt") startGame("blixt");
+    else if (a === "weak") startGame("weak");
+    else if (a === "zone") startGame("zone", t.getAttribute("data-z"));
+    else if (a === "cheat") cheat();
+    else if (a === "home") { if (G && G.timer) clearInterval(G.timer); home(); }
+    else if (a === "opt") answer(+t.getAttribute("data-i"));
+    else if (a === "next") advance();
+    else if (a === "quit") quit();
+    else if (a === "again") { var m = G.mode, z = G.z; startGame(m, z); }
+    else if (a === "snd") { S.snd = S.snd ? 0 : 1; save(); home(); }
+    else if (a === "reset") {
+      if (!resetArm) { resetArm = true; t.textContent = "Tryck igen för att nollställa"; }
+      else { S = blank(); save(); home(); }
+    }
+  });
+  app.addEventListener("input", function (e) { if (e.target && e.target.id === "srch") fillCheat(e.target.value); });
+
+  home();
+})();
+
+</script>
+
+</body></html>
